@@ -1,0 +1,49 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+#  Copyright (c) 2021 Francesco Santini <francesco.santini@gmail.com>
+
+
+import sys
+import argparse
+from progress.bar import Bar
+import time
+
+from DcmMvLib.dcmMvUtils import move_directory
+
+gui_available = True
+try:
+    import PySide2
+except:
+    gui_available = False
+
+if __name__ == '__main__':
+    if gui_available and len(sys.argv) == 1:
+        # no arguments, launch GUI
+        from DcmMvLib.dcmMvGui import run_interface
+        run_interface()
+
+    parser = argparse.ArgumentParser(description='Move DICOM files into a directory structure')
+    parser.add_argument('origin_directory', metavar='src', type=str, help='Origin directory with unsorted files')
+    parser.add_argument('dest_directory', metavar='dest', type=str, help='Destination directory with sorted files')
+    parser.add_argument('pattern', metavar='pattern', type=str, help='Directory pattern (example: %%PatientName%%/%%StudyDate%%/%%SeriesNumber%%_%%SeriesName%%)')
+    parser.add_argument('--copy', '-c', dest='copy', action='store_true', help='Copy files instead of moving')
+    
+    args = parser.parse_args()
+
+    src = args.origin_directory
+    dest = args.dest_directory
+    pattern = args.pattern
+    do_copy = args.copy
+
+    bar = Bar()
+
+    def update_progress(current, max):
+        bar.max = max
+        bar.goto(current)
+
+    move_directory(src, dest, pattern, do_copy, update_progress)
+
+    bar.finish()
+
+
