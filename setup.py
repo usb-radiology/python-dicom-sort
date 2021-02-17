@@ -12,7 +12,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/usb-radiology/python-dicom-sort",
-    install_requires=['pydicom', 'progress'],
+    install_requires=['pydicom', 'progress', 'pathvalidate'],
     extras_require={'GUI': ['PySide2']},
     scripts=['dicom_sort'],
     packages=['DcmMvLib'],

@@ -6,6 +6,7 @@ import os
 import re
 import shutil
 import pydicom
+from pathvalidate import sanitize_filepath
 
 UNKNOWN_TAG = 'UNKNOWN'
 DEBUG = False
@@ -48,8 +49,10 @@ def move_dicom_image(filename_in, destination_base_dir, pattern, copy=False):
         replacement = pattern_translate(dataset, m.group(1))
         pattern = pattern.replace(f'%{found_key}%', replacement)
 
+    dest_directory = sanitize_filepath(os.path.join(destination_base_dir, pattern), platform='auto')
+
     if not DRY_RUN:
-        os.makedirs(os.path.join(destination_base_dir, pattern), exist_ok=True)
+        os.makedirs(dest_directory, exist_ok=True)
 
     instance_number = pattern_translate(dataset, 'InstanceNumber')
     coil_info = pattern_translate(dataset, 'CoilInfo')
@@ -60,7 +63,7 @@ def move_dicom_image(filename_in, destination_base_dir, pattern, copy=False):
 
     dest_name = f'image{instance_number:04d}{extra_file_part}.dcm'
 
-    dest_path = os.path.join(destination_base_dir, pattern, dest_name)
+    dest_path = sanitize_filepath(os.path.join(destination_base_dir, pattern, dest_name), platform='auto')
 
     if DEBUG:
         print(f'{filename_in} -> {dest_path}')
@@ -76,9 +79,9 @@ def move_directory(dir_in, destination_base_dir, pattern, copy=False, callback_f
     file_list = []
     for root, dirs, files in os.walk(dir_in):
         file_list.extend([os.path.join(root, f) for f in files])
-    n_files = len(files)
-    for index, file in enumerate(files):
-        move_dicom_image(os.path.join(dir_in, file), destination_base_dir, pattern, copy)
+    n_files = len(file_list)
+    for index, file in enumerate(file_list):
+        move_dicom_image(file, destination_base_dir, pattern, copy)
         try:
             callback_function(index+1, n_files)
         except:

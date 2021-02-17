@@ -55,13 +55,13 @@ class DicomMoveWindow(QWidget, Ui_DcmMvDialogUI):
     @Slot()
     def choose_src(self):
         selected_dir = QFileDialog.getExistingDirectory(self, 'Select source folder')
-        self.source_location_text.setText(selected_dir)
+        self.source_location_text.setText(selected_dir.replace('/', os.sep))
         self.execute_conditional_enable()
 
     @Slot()
     def choose_dest(self):
         selected_dir = QFileDialog.getExistingDirectory(self, 'Select destination folder')
-        self.destination_location_text.setText(selected_dir)
+        self.destination_location_text.setText(selected_dir.replace('/', os.sep))
         self.execute_conditional_enable()
 
     @Slot()
