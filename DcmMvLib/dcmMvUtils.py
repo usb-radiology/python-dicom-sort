@@ -34,6 +34,8 @@ def pattern_translate(dataset, attribute):
             return str(dataset[0x0051, 0x100F]) # Siemens private field
         except:
             return UNKNOWN_TAG
+    if attribute == 'SeriesNumber':
+        return get_dicom_attribute(dataset, attribute).rjust(2,'0')
     return get_dicom_attribute(dataset, attribute)
 
 
