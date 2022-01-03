@@ -12,6 +12,12 @@ UNKNOWN_TAG = 'UNKNOWN'
 DEBUG = False
 DRY_RUN = False
 
+def safe_int(s):
+    try:
+        return int(s)
+    except ValueError:
+        return 0
+
 def get_dicom_attribute(dataset, attribute):
     try:
         return str(getattr(dataset, attribute))
@@ -28,7 +34,7 @@ def pattern_translate(dataset, attribute):
         if res == UNKNOWN_TAG:
             return get_dicom_attribute(dataset, 'PatientsName')
     if attribute == 'InstanceNumber':
-        return int(get_dicom_attribute(dataset, 'InstanceNumber'))
+        return safe_int(get_dicom_attribute(dataset, 'InstanceNumber'))
     if attribute == 'CoilInfo':
         try:
             return str(dataset[0x0051, 0x100F]) # Siemens private field
